@@ -1,0 +1,85 @@
+name: AXI4 Verification CI
+
+on:
+  push:
+    branches: [ main, "feature/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  compile-and-simulate:
+    name: Compile & Run (Icarus Verilog)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y iverilog
+          iverilog -V
+
+      - name: Compile testbench
+        run: |
+          iverilog -g2012 -o sim/axi4_sim.vvp sim/axi4_tb_iverilog.sv
+          echo "Compilation successful"
+
+      - name: Run simulation
+        run: |
+          cd sim
+          vvp axi4_sim.vvp | tee ../sim_output.log
+          echo "Simulation finished"
+
+      - name: Check verification result
+        run: |
+          if grep -q "VERIFICATION PASSED" sim_output.log; then
+            echo "RESULT: VERIFICATION PASSED"
+          else
+            echo "RESULT: VERIFICATION FAILED"
+            exit 1
+          fi
+
+      - name: Show test summary
+        run: |
+          echo "========== TEST SUMMARY =========="
+          grep -E "Tests Run|Passed|Failed|Pass Rate|Mismatches|FUNCTIONAL COVERAGE" sim_output.log || true
+          echo "=================================="
+
+      - name: Upload simulation log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: simulation-log
+          path: sim_output.log
+          retention-days: 30
+
+      - name: Upload VCD waveform
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vcd-waveform
+          path: sim/axi4_waves.vcd
+          retention-days: 30
+
+  lint-check:
+    name: Syntax Check (all SV files)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog
+        run: sudo apt-get update -qq && sudo apt-get install -y iverilog
+
+      - name: Syntax check RTL files
+        run: |
+          echo "Checking rtl/axi4_slave.sv ..."
+          iverilog -g2012 -t null rtl/axi4_slave.sv && echo "  OK"
+          echo "Checking rtl/axi4_master.sv ..."
+          iverilog -g2012 -t null rtl/axi4_master.sv && echo "  OK"
+          echo "Checking axi4_protocol_checker.sv ..."
+          iverilog -g2012 -t null axi4_protocol_checker.sv && echo "  OK"
+          echo "All RTL syntax checks passed"
