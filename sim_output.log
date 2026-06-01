@@ -1,0 +1,263 @@
+================================================================================
+          AXI4 PROTOCOL VERIFICATION  -  IVERILOG RUN
+================================================================================
+
+[TEST 1] Single Write (1 beat, INCR, 8B)
+  PASS: Single Write
+[TEST 2] Single Read-Back
+[SCOREBOARD] Verified OK: base=0x00001000 len=1
+  PASS: Single Read-Back
+[TEST 3] Write-Read-Verify (4 beats)
+[SCOREBOARD] Verified OK: base=0x00002000 len=4
+  PASS: Write-Read-Verify
+[TEST 4] INCR Burst (16 beats, 8B)
+  PASS: INCR Burst 16 beats
+[TEST 5] FIXED Burst (8 beats, 4B - same address)
+  PASS: FIXED Burst
+[TEST 6] WRAP Burst (8 beats, len=7 - VALID)
+  PASS: WRAP Burst valid
+[TEST 7] Maximum Burst (256 beats, INCR, 4B)
+  PASS: Max Burst 256 beats
+[TEST 8] 4KB Boundary - LEGAL (ends exactly at 4096)
+  PASS: 4KB boundary legal
+[TEST 8b] 4KB Boundary - VIOLATION (checker must fire)
+[CHECKER] 4KB BOUNDARY VIOLATION: Addr=0x00000ff8 Len=2 Size=8B total=16
+  PASS: 4KB violation detected
+[TEST 9] WRAP Burst INVALID length (checker must fire)
+[CHECKER] WRAP LEN VIOLATION: 6 beats (must be 2/4/8/16)
+  PASS: WRAP invalid len detected
+[TEST 10] Address Alignment (1B/2B/4B/8B)
+  1B@0x6001: OK  2B@0x6002: OK  4B@0x6004: OK  8B@0x6008: OK
+  PASS: Address alignment
+[TEST 11] Back-to-Back Writes (5 transactions)
+  Txn 0: Addr=0x00012000 Beats=4
+  Txn 1: Addr=0x00012020 Beats=4
+  Txn 2: Addr=0x00012040 Beats=4
+  Txn 3: Addr=0x00012060 Beats=4
+  Txn 4: Addr=0x00012080 Beats=4
+  PASS: Back-to-Back writes
+[TEST 12] Random Traffic (200 write+read transactions)
+[SCOREBOARD] Verified OK: base=0x00000c58 len=5
+  Progress 0/200
+[SCOREBOARD] Verified OK: base=0x00000ee8 len=4
+[SCOREBOARD] Verified OK: base=0x00000220 len=16
+[SCOREBOARD] Verified OK: base=0x00000770 len=8
+[SCOREBOARD] Verified OK: base=0x000009b0 len=7
+[SCOREBOARD] Verified OK: base=0x000000c8 len=12
+[SCOREBOARD] Verified OK: base=0x00000280 len=11
+[SCOREBOARD] Verified OK: base=0x00000d20 len=10
+[SCOREBOARD] Verified OK: base=0x00000058 len=9
+[SCOREBOARD] Verified OK: base=0x00000728 len=12
+[SCOREBOARD] Verified OK: base=0x00000330 len=13
+[SCOREBOARD] Verified OK: base=0x00000350 len=2
+[SCOREBOARD] Verified OK: base=0x00000058 len=10
+[SCOREBOARD] Verified OK: base=0x00000cd8 len=9
+[SCOREBOARD] Verified OK: base=0x000006a0 len=2
+[SCOREBOARD] Verified OK: base=0x000000c8 len=16
+[SCOREBOARD] Verified OK: base=0x000003e8 len=11
+[SCOREBOARD] Verified OK: base=0x00000608 len=15
+[SCOREBOARD] Verified OK: base=0x000005d8 len=13
+[SCOREBOARD] Verified OK: base=0x00000cc8 len=2
+[SCOREBOARD] Verified OK: base=0x00000098 len=8
+[SCOREBOARD] Verified OK: base=0x00000058 len=16
+[SCOREBOARD] Verified OK: base=0x00000e40 len=4
+[SCOREBOARD] Verified OK: base=0x00000238 len=1
+[SCOREBOARD] Verified OK: base=0x00000ff0 len=2
+[SCOREBOARD] Verified OK: base=0x00000b58 len=2
+[SCOREBOARD] Verified OK: base=0x00000c58 len=16
+[SCOREBOARD] Verified OK: base=0x000008b8 len=14
+[SCOREBOARD] Verified OK: base=0x00000c90 len=7
+[SCOREBOARD] Verified OK: base=0x00000360 len=15
+[SCOREBOARD] Verified OK: base=0x00000020 len=5
+[SCOREBOARD] Verified OK: base=0x00000d38 len=2
+[SCOREBOARD] Verified OK: base=0x00000548 len=16
+[SCOREBOARD] Verified OK: base=0x00000c90 len=6
+[SCOREBOARD] Verified OK: base=0x000005f8 len=16
+[SCOREBOARD] Verified OK: base=0x000003f8 len=5
+[SCOREBOARD] Verified OK: base=0x00000048 len=11
+[SCOREBOARD] Verified OK: base=0x00000660 len=1
+[SCOREBOARD] Verified OK: base=0x000003c8 len=3
+[SCOREBOARD] Verified OK: base=0x00000488 len=12
+[SCOREBOARD] Verified OK: base=0x00000230 len=3
+[SCOREBOARD] Verified OK: base=0x00000af0 len=13
+[SCOREBOARD] Verified OK: base=0x00000a90 len=2
+[SCOREBOARD] Verified OK: base=0x00000c00 len=4
+[SCOREBOARD] Verified OK: base=0x000005c8 len=7
+[SCOREBOARD] Verified OK: base=0x00000980 len=14
+[SCOREBOARD] Verified OK: base=0x000006c8 len=8
+[SCOREBOARD] Verified OK: base=0x000001f8 len=14
+[SCOREBOARD] Verified OK: base=0x00000b60 len=16
+[SCOREBOARD] Verified OK: base=0x00000cb8 len=2
+[SCOREBOARD] Verified OK: base=0x00000470 len=9
+  Progress 50/200
+[SCOREBOARD] Verified OK: base=0x00000638 len=12
+[SCOREBOARD] Verified OK: base=0x00000b10 len=14
+[SCOREBOARD] Verified OK: base=0x00000ef0 len=11
+[SCOREBOARD] Verified OK: base=0x00000fa8 len=4
+[SCOREBOARD] Verified OK: base=0x00000298 len=3
+[SCOREBOARD] Verified OK: base=0x00000a40 len=13
+[SCOREBOARD] Verified OK: base=0x00000208 len=6
+[SCOREBOARD] Verified OK: base=0x00000f28 len=4
+[SCOREBOARD] Verified OK: base=0x00000b98 len=14
+[SCOREBOARD] Verified OK: base=0x00000988 len=11
+[SCOREBOARD] Verified OK: base=0x000004c0 len=7
+[SCOREBOARD] Verified OK: base=0x00000430 len=5
+[SCOREBOARD] Verified OK: base=0x000008e8 len=13
+[SCOREBOARD] Verified OK: base=0x00000460 len=3
+[SCOREBOARD] Verified OK: base=0x00000c78 len=16
+[SCOREBOARD] Verified OK: base=0x00000670 len=9
+[SCOREBOARD] Verified OK: base=0x00000f60 len=2
+[SCOREBOARD] Verified OK: base=0x00000828 len=3
+[SCOREBOARD] Verified OK: base=0x00000bc0 len=4
+[SCOREBOARD] Verified OK: base=0x00000778 len=3
+[SCOREBOARD] Verified OK: base=0x00000f48 len=4
+[SCOREBOARD] Verified OK: base=0x00000eb8 len=10
+[SCOREBOARD] Verified OK: base=0x00000fe8 len=3
+[SCOREBOARD] Verified OK: base=0x00000740 len=10
+[SCOREBOARD] Verified OK: base=0x00000128 len=3
+[SCOREBOARD] Verified OK: base=0x00000aa0 len=14
+[SCOREBOARD] Verified OK: base=0x00000ca0 len=1
+[SCOREBOARD] Verified OK: base=0x00000ff8 len=1
+[SCOREBOARD] Verified OK: base=0x00000258 len=6
+[SCOREBOARD] Verified OK: base=0x000001b8 len=2
+[SCOREBOARD] Verified OK: base=0x000000a0 len=5
+[SCOREBOARD] Verified OK: base=0x00000400 len=7
+[SCOREBOARD] Verified OK: base=0x00000e10 len=16
+[SCOREBOARD] Verified OK: base=0x000005d0 len=16
+[SCOREBOARD] Verified OK: base=0x00000150 len=4
+[SCOREBOARD] Verified OK: base=0x00000e38 len=10
+[SCOREBOARD] Verified OK: base=0x00000140 len=4
+[SCOREBOARD] Verified OK: base=0x00000918 len=6
+[SCOREBOARD] Verified OK: base=0x00000df0 len=6
+[SCOREBOARD] Verified OK: base=0x00000e88 len=1
+[SCOREBOARD] Verified OK: base=0x00000578 len=15
+[SCOREBOARD] Verified OK: base=0x00000148 len=6
+[SCOREBOARD] Verified OK: base=0x00000648 len=4
+[SCOREBOARD] Verified OK: base=0x00000d58 len=7
+[SCOREBOARD] Verified OK: base=0x000004e0 len=14
+[SCOREBOARD] Verified OK: base=0x00000d30 len=4
+[SCOREBOARD] Verified OK: base=0x00000e88 len=5
+[SCOREBOARD] Verified OK: base=0x00000498 len=11
+[SCOREBOARD] Verified OK: base=0x00000128 len=9
+[SCOREBOARD] Verified OK: base=0x00000b20 len=13
+  Progress 100/200
+[SCOREBOARD] Verified OK: base=0x00000028 len=4
+[SCOREBOARD] Verified OK: base=0x00000df8 len=6
+[SCOREBOARD] Verified OK: base=0x000005b8 len=4
+[SCOREBOARD] Verified OK: base=0x00000f08 len=6
+[SCOREBOARD] Verified OK: base=0x00000c78 len=6
+[SCOREBOARD] Verified OK: base=0x00000360 len=16
+[SCOREBOARD] Verified OK: base=0x00000550 len=4
+[SCOREBOARD] Verified OK: base=0x00000918 len=2
+[SCOREBOARD] Verified OK: base=0x00000ff8 len=1
+[SCOREBOARD] Verified OK: base=0x00000678 len=9
+[SCOREBOARD] Verified OK: base=0x00000290 len=12
+[SCOREBOARD] Verified OK: base=0x000000f8 len=14
+[SCOREBOARD] Verified OK: base=0x00000890 len=3
+[SCOREBOARD] Verified OK: base=0x00000cc0 len=1
+[SCOREBOARD] Verified OK: base=0x00000cb0 len=3
+[SCOREBOARD] Verified OK: base=0x000005f0 len=6
+[SCOREBOARD] Verified OK: base=0x00000180 len=9
+[SCOREBOARD] Verified OK: base=0x00000d48 len=7
+[SCOREBOARD] Verified OK: base=0x000009a0 len=15
+[SCOREBOARD] Verified OK: base=0x00000898 len=16
+[SCOREBOARD] Verified OK: base=0x000002c8 len=5
+[SCOREBOARD] Verified OK: base=0x00000318 len=10
+[SCOREBOARD] Verified OK: base=0x00000d68 len=5
+[SCOREBOARD] Verified OK: base=0x00000600 len=10
+[SCOREBOARD] Verified OK: base=0x00000130 len=4
+[SCOREBOARD] Verified OK: base=0x00000d08 len=14
+[SCOREBOARD] Verified OK: base=0x000001b8 len=1
+[SCOREBOARD] Verified OK: base=0x00000b38 len=2
+[SCOREBOARD] Verified OK: base=0x000001d0 len=14
+[SCOREBOARD] Verified OK: base=0x000003b8 len=1
+[SCOREBOARD] Verified OK: base=0x00000418 len=9
+[SCOREBOARD] Verified OK: base=0x00000e70 len=1
+[SCOREBOARD] Verified OK: base=0x00000490 len=3
+[SCOREBOARD] Verified OK: base=0x000006a0 len=1
+[SCOREBOARD] Verified OK: base=0x00000920 len=4
+[SCOREBOARD] Verified OK: base=0x00000718 len=6
+[SCOREBOARD] Verified OK: base=0x00000b08 len=9
+[SCOREBOARD] Verified OK: base=0x00000310 len=16
+[SCOREBOARD] Verified OK: base=0x00000b68 len=4
+[SCOREBOARD] Verified OK: base=0x00000140 len=6
+[SCOREBOARD] Verified OK: base=0x00000f98 len=13
+[SCOREBOARD] Verified OK: base=0x00000748 len=13
+[SCOREBOARD] Verified OK: base=0x000006d8 len=7
+[SCOREBOARD] Verified OK: base=0x00000d78 len=6
+[SCOREBOARD] Verified OK: base=0x00000e68 len=13
+[SCOREBOARD] Verified OK: base=0x00000e90 len=12
+[SCOREBOARD] Verified OK: base=0x00000278 len=4
+[SCOREBOARD] Verified OK: base=0x000001d8 len=15
+[SCOREBOARD] Verified OK: base=0x000003c0 len=12
+[SCOREBOARD] Verified OK: base=0x000004f0 len=11
+  Progress 150/200
+[SCOREBOARD] Verified OK: base=0x00000e90 len=9
+[SCOREBOARD] Verified OK: base=0x00000bb0 len=14
+[SCOREBOARD] Verified OK: base=0x00000130 len=16
+[SCOREBOARD] Verified OK: base=0x000006d0 len=13
+[SCOREBOARD] Verified OK: base=0x00000150 len=7
+[SCOREBOARD] Verified OK: base=0x00000e38 len=2
+[SCOREBOARD] Verified OK: base=0x000007b8 len=3
+[SCOREBOARD] Verified OK: base=0x00000b68 len=4
+[SCOREBOARD] Verified OK: base=0x00000340 len=15
+[SCOREBOARD] Verified OK: base=0x00000858 len=10
+[SCOREBOARD] Verified OK: base=0x00000e18 len=7
+[SCOREBOARD] Verified OK: base=0x000008c0 len=16
+[SCOREBOARD] Verified OK: base=0x000000a0 len=15
+[SCOREBOARD] Verified OK: base=0x00000180 len=9
+[SCOREBOARD] Verified OK: base=0x00000c88 len=2
+[SCOREBOARD] Verified OK: base=0x000003e8 len=7
+[SCOREBOARD] Verified OK: base=0x00000cd0 len=6
+[SCOREBOARD] Verified OK: base=0x00000cd8 len=11
+[SCOREBOARD] Verified OK: base=0x000005c0 len=7
+[SCOREBOARD] Verified OK: base=0x000003e0 len=12
+[SCOREBOARD] Verified OK: base=0x00000cf0 len=11
+[SCOREBOARD] Verified OK: base=0x00000a50 len=15
+[SCOREBOARD] Verified OK: base=0x00000040 len=8
+[SCOREBOARD] Verified OK: base=0x00000410 len=3
+[SCOREBOARD] Verified OK: base=0x000003a0 len=7
+[SCOREBOARD] Verified OK: base=0x00000490 len=13
+[SCOREBOARD] Verified OK: base=0x00000938 len=8
+[SCOREBOARD] Verified OK: base=0x00000ce8 len=2
+[SCOREBOARD] Verified OK: base=0x000006d8 len=13
+[SCOREBOARD] Verified OK: base=0x00000808 len=4
+[SCOREBOARD] Verified OK: base=0x000006f8 len=3
+[SCOREBOARD] Verified OK: base=0x00000990 len=12
+[SCOREBOARD] Verified OK: base=0x000004c0 len=11
+[SCOREBOARD] Verified OK: base=0x00000178 len=3
+[SCOREBOARD] Verified OK: base=0x00000888 len=8
+[SCOREBOARD] Verified OK: base=0x00000a50 len=10
+[SCOREBOARD] Verified OK: base=0x000006f0 len=6
+[SCOREBOARD] Verified OK: base=0x00000540 len=16
+[SCOREBOARD] Verified OK: base=0x00000970 len=5
+[SCOREBOARD] Verified OK: base=0x000008e8 len=15
+[SCOREBOARD] Verified OK: base=0x00000290 len=16
+[SCOREBOARD] Verified OK: base=0x00000b88 len=13
+[SCOREBOARD] Verified OK: base=0x00000b50 len=4
+[SCOREBOARD] Verified OK: base=0x00000070 len=3
+[SCOREBOARD] Verified OK: base=0x00000e48 len=1
+[SCOREBOARD] Verified OK: base=0x00000ba0 len=14
+[SCOREBOARD] Verified OK: base=0x00000de8 len=14
+[SCOREBOARD] Verified OK: base=0x000003a8 len=14
+[SCOREBOARD] Verified OK: base=0x00000178 len=3
+  PASS: Random traffic 200
+[TEST 13] WRAP cache-line fill (8 beats, 64B)
+[SCOREBOARD] Verified OK: base=0x00020000 len=8
+  PASS: WRAP cache-line fill
+
+================================================================================
+                       TEST RESULTS SUMMARY
+================================================================================
+  Tests Run:    14
+  Passed:       14
+  Failed:       0
+  Write Txns:   212
+  Read  Txns:   203
+  Mismatches:   0
+  Total Errors: 2
+================================================================================
+
+*** VERIFICATION PASSED - All 14 tests OK ***
+
+axi4_tb_iverilog.sv:317: $finish called at 0 (1ps)
