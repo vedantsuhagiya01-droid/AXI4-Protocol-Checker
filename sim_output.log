@@ -1,3 +1,4 @@
+VCD info: dumpfile axi4_waves.vcd opened for output.
 ================================================================================
           AXI4 PROTOCOL VERIFICATION  -  IVERILOG RUN
 ================================================================================
@@ -252,12 +253,25 @@
   Tests Run:    14
   Passed:       14
   Failed:       0
+  Pass Rate:    100.0%
   Write Txns:   212
   Read  Txns:   203
   Mismatches:   0
   Total Errors: 2
 ================================================================================
 
+  FUNCTIONAL COVERAGE SUMMARY (manual bins):
+  Single-beat transactions : 2 hit(s)
+  Short burst (<=16 beats) : 1 hit(s)
+  Maximum burst (256 beats): 1 hit(s)
+  FIXED burst              : 1 hit(s)
+  WRAP burst               : 1 hit(s)
+  4KB boundary checks      : 2 hit(s)
+  Alignment checks         : 1 hit(s)
+  Random traffic runs      : 1 hit(s)
+  Waveform written to      : axi4_waves.vcd
+================================================================================
+
 *** VERIFICATION PASSED - All 14 tests OK ***
 
-axi4_tb_iverilog.sv:317: $finish called at 0 (1ps)
+axi4_tb_iverilog.sv:364: $finish called at 18000 (1ps)

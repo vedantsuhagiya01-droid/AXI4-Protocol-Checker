@@ -1,4 +1,5 @@
 // AXI4 Protocol Verification Testbench (iverilog-compatible, no OOP)
+// Features: VCD waveform dump, protocol checkers, scoreboard, coverage stats
 `timescale 1ns/1ps
 
 module axi4_tb_iverilog;
@@ -24,6 +25,19 @@ module axi4_tb_iverilog;
   integer tests_run=0, tests_passed=0, tests_failed=0;
   integer writes_proc=0, reads_proc=0, mismatches=0, errors=0;
   integer err_snap;
+
+  // ── Coverage buckets (manual functional coverage) ─────────────────────────
+  integer cov_single_beat=0, cov_short_burst=0, cov_long_burst=0;
+  integer cov_max_burst=0,   cov_fixed=0,        cov_wrap=0;
+  integer cov_4kb_check=0,   cov_alignment=0,    cov_random=0;
+
+  // ── VCD waveform signals (mirror key scoreboard state) ───────────────────
+  reg        vcd_write;
+  reg [31:0] vcd_addr;
+  reg [7:0]  vcd_len;
+  reg [2:0]  vcd_size;
+  reg [1:0]  vcd_burst;
+  reg        vcd_pass;
 
   // ── Helpers ───────────────────────────────────────────────────────────────
   function [31:0] next_addr;
@@ -161,7 +175,13 @@ module axi4_tb_iverilog;
   reg [1:0]  burst;
 
   initial begin
+    // ── VCD waveform dump ─────────────────────────────────────────────────────
+    $dumpfile("axi4_waves.vcd");
+    $dumpvars(0, axi4_tb_iverilog);
+
+    // Initialise memory and VCD mirror signals
     for (i = 0; i < MEM_DEPTH; i = i + 1) mem[i] = 8'h00;
+    vcd_write=0; vcd_addr=0; vcd_len=0; vcd_size=0; vcd_burst=0; vcd_pass=0;
 
     $display("================================================================================");
     $display("          AXI4 PROTOCOL VERIFICATION  -  IVERILOG RUN");
@@ -170,16 +190,19 @@ module axi4_tb_iverilog;
     // ── T1: Single write ────────────────────────────────────────────────────
     $display("[TEST 1] Single Write (1 beat, INCR, 8B)");
     addr=32'h0000_1000; len=0; size=SIZE_8B; burst=INCR;
+    #1 vcd_write=1; vcd_addr=addr; vcd_len=len; vcd_size=size; vcd_burst=burst;
     chk_alignment(addr,size,0); chk_4kb(addr,len,size,0);
     fill_data(len); sb_write(addr,len,size,burst);
-    err_snap=errors;
+    err_snap=errors; cov_single_beat=cov_single_beat+1;
+    #1 vcd_pass=(errors==err_snap);
     if(errors==err_snap) pass_test("Single Write"); else fail_test("Single Write");
 
     // ── T2: Single read-back ─────────────────────────────────────────────────
     $display("[TEST 2] Single Read-Back");
-    // Populate txn_data from mem so scoreboard sees a match
     for (i=0; i<STRB_WIDTH; i=i+1) txn_data[0][i*8 +: 8] = mem[addr+i];
+    #1 vcd_write=0; vcd_addr=addr; cov_single_beat=cov_single_beat+1;
     err_snap=errors; sb_read(addr,len,size,burst);
+    #1 vcd_pass=(errors==err_snap);
     if(errors==err_snap) pass_test("Single Read-Back"); else fail_test("Single Read-Back");
 
     // ── T3: Write-Read-Verify (data integrity) ───────────────────────────────
@@ -194,47 +217,57 @@ module axi4_tb_iverilog;
     // ── T4: INCR burst 16 beats ───────────────────────────────────────────────
     $display("[TEST 4] INCR Burst (16 beats, 8B)");
     addr=32'h0000_3000; len=15; size=SIZE_8B; burst=INCR;
+    #1 vcd_write=1; vcd_addr=addr; vcd_len=len; vcd_burst=burst;
     chk_alignment(addr,size,2); chk_4kb(addr,len,size,2);
     fill_data(len); sb_write(addr,len,size,burst);
-    err_snap=errors;
+    err_snap=errors; cov_short_burst=cov_short_burst+1;
+    #1 vcd_pass=(errors==err_snap);
     if(errors==err_snap) pass_test("INCR Burst 16 beats"); else fail_test("INCR Burst 16 beats");
 
     // ── T5: FIXED burst ───────────────────────────────────────────────────────
     $display("[TEST 5] FIXED Burst (8 beats, 4B - same address)");
     addr=32'h0000_4000; len=7; size=SIZE_4B; burst=FIXED;
+    #1 vcd_write=1; vcd_addr=addr; vcd_len=len; vcd_burst=burst;
     chk_alignment(addr,size,3);
     fill_data(len); sb_write(addr,len,size,burst);
-    err_snap=errors;
+    err_snap=errors; cov_fixed=cov_fixed+1;
+    #1 vcd_pass=(errors==err_snap);
     if(errors==err_snap) pass_test("FIXED Burst"); else fail_test("FIXED Burst");
 
     // ── T6: WRAP burst valid ─────────────────────────────────────────────────
     $display("[TEST 6] WRAP Burst (8 beats, len=7 - VALID)");
     addr=32'h0000_5000; len=7; size=SIZE_8B; burst=WRAP;
+    #1 vcd_write=1; vcd_addr=addr; vcd_len=len; vcd_burst=burst;
     chk_alignment(addr,size,4); chk_wrap_len(len,4); chk_4kb(addr,len,size,4);
     fill_data(len); sb_write(addr,len,size,burst);
-    err_snap=errors;
+    err_snap=errors; cov_wrap=cov_wrap+1;
+    #1 vcd_pass=(errors==err_snap);
     if(errors==err_snap) pass_test("WRAP Burst valid"); else fail_test("WRAP Burst valid");
 
     // ── T7: Max burst 256 beats ───────────────────────────────────────────────
     $display("[TEST 7] Maximum Burst (256 beats, INCR, 4B)");
     addr=32'h0001_0000; len=255; size=SIZE_4B; burst=INCR;
+    #1 vcd_write=1; vcd_addr=addr; vcd_len=len; vcd_burst=burst;
     chk_alignment(addr,size,5); chk_4kb(addr,len,size,5);
     fill_data(len); sb_write(addr,len,size,burst);
-    err_snap=errors;
+    err_snap=errors; cov_max_burst=cov_max_burst+1;
+    #1 vcd_pass=(errors==err_snap);
     if(errors==err_snap) pass_test("Max Burst 256 beats"); else fail_test("Max Burst 256 beats");
 
     // ── T8: 4KB boundary LEGAL ───────────────────────────────────────────────
     $display("[TEST 8] 4KB Boundary - LEGAL (ends exactly at 4096)");
     addr=32'h0000_0FF0; len=1; size=SIZE_8B; burst=INCR;
-    // (0xFF0 & 0xFFF) + 2*8 = 0xFF0 + 16 = 4096 -- exactly at boundary, legal
-    err_snap=errors; chk_4kb(addr,len,size,6);
+    #1 vcd_addr=addr; vcd_len=len;
+    err_snap=errors; chk_4kb(addr,len,size,6); cov_4kb_check=cov_4kb_check+1;
+    #1 vcd_pass=(errors==err_snap);
     if(errors==err_snap) pass_test("4KB boundary legal"); else fail_test("4KB boundary legal");
 
     // ── T8b: 4KB boundary VIOLATION ──────────────────────────────────────────
     $display("[TEST 8b] 4KB Boundary - VIOLATION (checker must fire)");
     addr=32'h0000_0FF8; len=1; size=SIZE_8B; burst=INCR;
-    // (0xFF8 & 0xFFF) + 2*8 = 0xFF8 + 16 = 4104 > 4096 -- VIOLATION
-    err_snap=errors; chk_4kb(addr,len,size,7);
+    #1 vcd_addr=addr; vcd_len=len;
+    err_snap=errors; chk_4kb(addr,len,size,7); cov_4kb_check=cov_4kb_check+1;
+    #1 vcd_pass=(errors>err_snap);
     if(errors>err_snap) pass_test("4KB violation detected");
     else fail_test("4KB violation NOT detected");
 
@@ -246,15 +279,15 @@ module axi4_tb_iverilog;
 
     // ── T10: Address alignment all sizes ──────────────────────────────────────
     $display("[TEST 10] Address Alignment (1B/2B/4B/8B)");
-    err_snap=errors;
+    err_snap=errors; cov_alignment=cov_alignment+1;
     begin
-      // All properly aligned - no errors expected
       chk_alignment(32'h0000_6001, SIZE_1B, 9);
       chk_alignment(32'h0000_6002, SIZE_2B, 9);
       chk_alignment(32'h0000_6004, SIZE_4B, 9);
       chk_alignment(32'h0000_6008, SIZE_8B, 9);
       $display("  1B@0x6001: OK  2B@0x6002: OK  4B@0x6004: OK  8B@0x6008: OK");
     end
+    #1 vcd_pass=(errors==err_snap);
     if(errors==err_snap) pass_test("Address alignment"); else fail_test("Address alignment");
 
     // ── T11: Back-to-back writes ──────────────────────────────────────────────
@@ -286,6 +319,8 @@ module axi4_tb_iverilog;
       sb_read(addr,len,size,burst);
       if (i%50==0) $display("  Progress %0d/200", i);
     end
+    cov_random=cov_random+1;
+    #1 vcd_pass=(errors==err_snap && mismatches==0);
     if(errors==err_snap && mismatches==0) pass_test("Random traffic 200");
     else fail_test("Random traffic 200");
 
@@ -304,10 +339,22 @@ module axi4_tb_iverilog;
     $display("  Tests Run:    %0d", tests_run);
     $display("  Passed:       %0d", tests_passed);
     $display("  Failed:       %0d", tests_failed);
+    $display("  Pass Rate:    %.1f%%", (tests_passed * 100.0) / tests_run);
     $display("  Write Txns:   %0d", writes_proc);
     $display("  Read  Txns:   %0d", reads_proc);
     $display("  Mismatches:   %0d", mismatches);
     $display("  Total Errors: %0d", errors);
+    $display("================================================================================");
+    $display("\n  FUNCTIONAL COVERAGE SUMMARY (manual bins):");
+    $display("  Single-beat transactions : %0d hit(s)", cov_single_beat);
+    $display("  Short burst (<=16 beats) : %0d hit(s)", cov_short_burst);
+    $display("  Maximum burst (256 beats): %0d hit(s)", cov_max_burst);
+    $display("  FIXED burst              : %0d hit(s)", cov_fixed);
+    $display("  WRAP burst               : %0d hit(s)", cov_wrap);
+    $display("  4KB boundary checks      : %0d hit(s)", cov_4kb_check);
+    $display("  Alignment checks         : %0d hit(s)", cov_alignment);
+    $display("  Random traffic runs      : %0d hit(s)", cov_random);
+    $display("  Waveform written to      : axi4_waves.vcd");
     $display("================================================================================");
     if (tests_failed == 0 && mismatches == 0)
       $display("\n*** VERIFICATION PASSED - All %0d tests OK ***\n", tests_run);
