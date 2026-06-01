@@ -1,0 +1,14 @@
+work/
+simv*
+csrc/
+xcelium.d/
+*.log
+*.jou
+*.pb
+*.wdb
+*.vcd
+*.fsdb
+*.vpd
+DVEfiles/
+inter.vpd
+ucli.key
